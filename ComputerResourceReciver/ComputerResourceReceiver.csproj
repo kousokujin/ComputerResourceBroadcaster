@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ComputerResourceBroadcaster.csproj">
+      <Project>{26020a03-0ced-4f20-94c8-774cb7e9c937}</Project>
+      <Name>ComputerResourceBroadcaster</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
