@@ -20,6 +20,7 @@ namespace ComputerResourceBroadcaster
             ws = new MyWebSocket(11000);
             interval = 1000;
             looptsk = StartLoop();
+            ws.ListenMessage();
 
             ws.packet_receive += receive;
         }
