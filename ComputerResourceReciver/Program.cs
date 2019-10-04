@@ -5,6 +5,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.WebSockets;
+using ComputerResourceBroadcaster;
+using System.Threading;
 
 namespace ComputerResourceReciver
 {
@@ -12,18 +15,20 @@ namespace ComputerResourceReciver
     {
         static int port;
         static UdpClient client;
+        static ClientWebSocket ws;
+        const int MessageBufferSize = 256;
 
         static void Main(string[] args)
         {
-            port = 11000;
+            port = 11001;
             client = new UdpClient(port);
             Console.WriteLine("listen...");
-            ListenBroadcastMessage();
+            string ip = ListenBroadcastMessage();
+            Connect(ip);
             Console.WriteLine("connect!!");
-            ListenMessage();
         }
 
-        static void ListenBroadcastMessage()
+        static string ListenBroadcastMessage()
         {
 
             // ブロードキャストを監視するエンドポイント
@@ -35,31 +40,27 @@ namespace ComputerResourceReciver
 
             // 受信データを変換
             var data = Encoding.UTF8.GetString(buffer);
-
-            sendMessage("{hellopkt}", remote.Address.ToString());
+            Console.WriteLine("receive:{0}", data);
+            return remote.Address.ToString();
         }
 
-        static async void sendMessage(string message, string ip)
+        static async void Connect(string ip)
         {
-            var remote = new IPEndPoint(IPAddress.Parse(ip), port);
-            var enc_message = Encoding.UTF8.GetBytes(message);
-
-            client.Connect(remote);
-            await client.SendAsync(enc_message, enc_message.Length);
-            Console.WriteLine("message send:{0} to:{1}", message, ip);
-        }
-
-        static void ListenMessage()
-        {
-            var remote = new IPEndPoint(IPAddress.Any, port);
-
-            while (true)
+            if (ws == null)
             {
-                //client.Connect(remote);
-                var receive = client.Receive(ref remote);
-                var str = Encoding.UTF8.GetString(receive);
+                ws = new ClientWebSocket();
+            }
 
-                Console.WriteLine(str);
+            if (ws.State != WebSocketState.Open)
+            {
+                await ws.ConnectAsync(new Uri(string.Format("ws://{0}:{0}",ip,"11000")), CancellationToken.None);
+
+                while (ws.State == WebSocketState.Open)
+                {
+                    var buff = new ArraySegment<byte>(new byte[MessageBufferSize]);
+                    var ret = await ws.ReceiveAsync(buff, CancellationToken.None);
+                    Console.WriteLine("receive:{0}",((new UTF8Encoding()).GetString(buff.Take(ret.Count).ToArray())));
+                }
             }
         }
     }
