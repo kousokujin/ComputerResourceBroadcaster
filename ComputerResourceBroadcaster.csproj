@@ -60,9 +60,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Interfaces.cs" />
     <Compile Include="resouce_sender.cs" />
     <Compile Include="ResourceGetter.cs" />
+    <Compile Include="StaticMethods.cs" />
     <Compile Include="UDP.cs" />
+    <Compile Include="WebSocket.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

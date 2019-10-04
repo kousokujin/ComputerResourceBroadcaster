@@ -20,15 +20,16 @@ namespace ComputerResourceBroadcaster
     /// </summary>
     public partial class MainWindow : Window
     {
-        private resouce_sender res;
+        private List<resouce_sender> res;
         public MainWindow()
         {
             InitializeComponent();
+            res = new List<resouce_sender>();
         }
 
         private void Send_button_Click(object sender, RoutedEventArgs e)
         {
-            res = new resouce_sender();
+            res.Add(new resouce_sender());
         }
 
         private void receive(object sender, EventArgs e)

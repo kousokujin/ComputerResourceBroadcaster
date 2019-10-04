@@ -9,20 +9,19 @@ namespace ComputerResourceBroadcaster
 {
     class resouce_sender
     {
-        private UDP udpObj;
+        private UDP broadcastUDP;
+        private MyWebSocket ws;
         private int interval;
         private Task looptsk;
 
-        private List<string> client_ip;
-
         public resouce_sender()
         {
-            udpObj = new UDP(11000);
-            interval = 10000;
+            broadcastUDP = new UDP(11001);
+            ws = new MyWebSocket(11000);
+            interval = 1000;
             looptsk = StartLoop();
-            udpObj.udp_receive += receive;
 
-            client_ip = new List<string>();
+            ws.packet_receive += receive;
         }
 
 
@@ -30,14 +29,21 @@ namespace ComputerResourceBroadcaster
         {
             var brgData = new regular_broadcast_info();
             brgData.name = Environment.MachineName;
-            brgData.ip = UDP.getMyIPv4()[0];
+            brgData.ip = StaticMethods.getMyIPv4()[0];
+            string jsonStr = JsonConvert.SerializeObject(brgData);
+
+            int count = 0;
             while (true)
             {
-                string jsonStr = JsonConvert.SerializeObject(brgData);
-                udpObj.broadcast(jsonStr);
-                sendData_allClient();
                 System.Threading.Thread.Sleep(interval);
 
+                if (count % 10 == 0)
+                {
+                    var ts = broadcastUDP.broadcast(jsonStr);
+                }
+                var t = sendData_allClient();
+                count++;
+                count %= 10;
 
             }
         }
@@ -49,18 +55,8 @@ namespace ComputerResourceBroadcaster
         /// <param name="e"></param>
         public void receive(object sender, EventArgs e)
         {
-            if(e is UDP_ReceiveData)
+            if(e is WS_ReceiveData)
             {
-                var evn = e as UDP_ReceiveData;
-
-                switch(evn.data)
-                {
-                    case "{hellopkt}":
-                        client_ip.Add(evn.ip);
-                        return;
-                    default:
-                        return;
-                }
             }
         }
 
@@ -80,23 +76,11 @@ namespace ComputerResourceBroadcaster
         }
 
         /// <summary>
-        /// 指定IPにデータを送る
-        /// </summary>
-        /// <param name="ip"></param>
-        private void sendData(string ip)
-        {
-            udpObj.sendMessage(getCPUdata(), ip);
-        }
-
-        /// <summary>
         /// すべてのクライアントにCPUの使用率とか送る
         /// </summary>
-        private void sendData_allClient()
+        private async Task sendData_allClient()
         {
-            foreach(var ip in client_ip)
-            {
-                sendData(ip);
-            }
+            await ws.broadcast(getCPUdata());
         }
 
         
