@@ -11,12 +11,16 @@ namespace ComputerResourceReciver
     class Program
     {
         static int port;
+        static int broadcastport;
         static UdpClient client;
+        static UdpClient udpbroadcast;
 
         static void Main(string[] args)
         {
             port = 11000;
+            broadcastport = 11001;
             client = new UdpClient(port);
+            udpbroadcast = new UdpClient(broadcastport);
             Console.WriteLine("listen...");
             ListenBroadcastMessage();
             Console.WriteLine("connect!!");
@@ -31,11 +35,14 @@ namespace ComputerResourceReciver
 
             // データ受信を待機（同期処理なので受信完了まで処理が止まる）
             // 受信した際は、 remote にどの IPアドレス から受信したかが上書きされる
-            var buffer = client.Receive(ref remote);
+            var buffer = udpbroadcast.Receive(ref remote);
 
             // 受信データを変換
             var data = Encoding.UTF8.GetString(buffer);
 
+            sendMessage("{hellopkt}", remote.Address.ToString());
+            sendMessage("{hellopkt}", remote.Address.ToString());
+            sendMessage("{hellopkt}", remote.Address.ToString());
             sendMessage("{hellopkt}", remote.Address.ToString());
         }
 
