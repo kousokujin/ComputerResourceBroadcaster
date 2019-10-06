@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
-using ComputerResourceBroadcaster;
 using System.Threading;
 
 namespace ComputerResourceReciver
@@ -21,11 +20,13 @@ namespace ComputerResourceReciver
         static void Main(string[] args)
         {
             port = 11001;
-            client = new UdpClient(port);
-            Console.WriteLine("listen...");
-            string ip = ListenBroadcastMessage();
-            Connect(ip);
+            //client = new UdpClient(port);
+            //Console.WriteLine("listen...");
+            //string ip = ListenBroadcastMessage();
+            Connect("192.168.100.105");
             Console.WriteLine("connect!!");
+
+            Console.ReadLine();
         }
 
         static string ListenBroadcastMessage()
@@ -53,7 +54,7 @@ namespace ComputerResourceReciver
 
             if (ws.State != WebSocketState.Open)
             {
-                await ws.ConnectAsync(new Uri(string.Format("ws://{0}:{0}",ip,"11000")), CancellationToken.None);
+                await ws.ConnectAsync(new Uri(string.Format("ws://{0}:{1}",ip,"11000")), CancellationToken.None);
 
                 while (ws.State == WebSocketState.Open)
                 {

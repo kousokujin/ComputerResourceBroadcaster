@@ -10,19 +10,19 @@ namespace ComputerResourceBroadcaster
     class resouce_sender
     {
         private UDP broadcastUDP;
-        private MyWebSocket ws;
+        private Isocket socket;
         private int interval;
         private Task looptsk;
 
         public resouce_sender()
         {
             broadcastUDP = new UDP(11001);
-            ws = new MyWebSocket(11000);
+            socket = new TCP(11000);
             interval = 1000;
             looptsk = StartLoop();
-            ws.ListenMessage();
+            Task t =socket.ListenMessage();
 
-            ws.packet_receive += receive;
+            socket.packet_receive += receive;
         }
 
 
@@ -81,7 +81,7 @@ namespace ComputerResourceBroadcaster
         /// </summary>
         private async Task sendData_allClient()
         {
-            await ws.broadcast(getCPUdata());
+            await socket.broadcast(getCPUdata());
         }
 
         
