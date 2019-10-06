@@ -26,6 +26,7 @@ namespace ComputerResourceReciver
             string ip = ListenBroadcastMessage();
             Connect(ip);
             Console.WriteLine("connect!!");
+            Console.ReadLine();
         }
 
         static string ListenBroadcastMessage()
@@ -53,8 +54,8 @@ namespace ComputerResourceReciver
 
             if (ws.State != WebSocketState.Open)
             {
-                await ws.ConnectAsync(new Uri(string.Format("ws://{0}:{0}",ip,"11000")), CancellationToken.None);
-
+                await ws.ConnectAsync(new Uri(string.Format("ws://{0}:{1}/",ip,"11000")), CancellationToken.None);
+                Console.WriteLine();
                 while (ws.State == WebSocketState.Open)
                 {
                     var buff = new ArraySegment<byte>(new byte[MessageBufferSize]);
