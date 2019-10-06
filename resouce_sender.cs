@@ -56,9 +56,6 @@ namespace ComputerResourceBroadcaster
         /// <param name="e"></param>
         public void receive(object sender, EventArgs e)
         {
-            if(e is WS_ReceiveData)
-            {
-            }
         }
 
         /// <summary>

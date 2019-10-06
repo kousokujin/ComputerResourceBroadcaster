@@ -12,6 +12,8 @@ namespace ComputerResourceBroadcaster
     static class ResourceGetter
     {
         static ComputerInfo info;
+        static PerformanceCounter cpu_all;
+        static List<PerformanceCounter> cpu;
 
         /// <summary>
         /// 全物理メモリ(MB)
@@ -27,6 +29,13 @@ namespace ComputerResourceBroadcaster
         static ResourceGetter()
         {
             info = new ComputerInfo();
+            cpu_all = new PerformanceCounter("Processor", "% Processor Time", "_Total", true);
+            cpu = new List<PerformanceCounter>();
+
+            for(int i = 0; i < Environment.ProcessorCount; i++)
+            {
+                cpu.Add(new PerformanceCounter("Processor", "% Processor Time", i.ToString(), true));
+            }
 
         }
         /// <summary>
@@ -35,10 +44,7 @@ namespace ComputerResourceBroadcaster
         /// <returns>CPU使用率[%]</returns>
         public static float getAllCPU()
         {
-            using (PerformanceCounter pc = new PerformanceCounter("Processor","% Processor Time", "_Total", true))
-            {
-                return pc.NextValue();
-            }
+                return cpu_all.NextValue();
 
         }
 
@@ -48,19 +54,8 @@ namespace ComputerResourceBroadcaster
         /// <returns>コアごとのCPU使用率の配列</returns>
         public static List<float> cpu_useges()
         {
-            int processors = Environment.ProcessorCount;
-            List<float> usages = new List<float>();
 
-            for(int i = 0; i < processors; i++)
-            {
-                using (PerformanceCounter pc = new PerformanceCounter("Processor", "% Processor Time",i.ToString() , true))
-                {
-                    usages.Add(pc.NextValue());
-                }
-
-            }
-
-            return usages;
+            return cpu.Select(x => x.NextValue()).ToList();
         }
 
         /// <summary>

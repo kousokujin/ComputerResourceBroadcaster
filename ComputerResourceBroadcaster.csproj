@@ -79,7 +79,6 @@
     <Compile Include="StaticMethods.cs" />
     <Compile Include="TCP.cs" />
     <Compile Include="UDP.cs" />
-    <Compile Include="WebSocket.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

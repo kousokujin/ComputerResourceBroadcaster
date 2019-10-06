@@ -51,8 +51,9 @@ namespace ComputerResourceBroadcaster
 
         public Task broadcast(string message)
         {
-            var sendMeg = message.Length.ToString(); ;
-            byte[] sendBytes = Encoding.UTF8.GetBytes(sendMeg);
+            //var sendMeg = message.Length.ToString(); ;
+            byte[] sendBytes = Encoding.UTF8.GetBytes(message);
+            Console.WriteLine(message);
 
             return Task.Run(()=>{
                 Parallel.ForEach(clients, (clt) =>
