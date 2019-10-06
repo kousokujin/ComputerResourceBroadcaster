@@ -31,14 +31,20 @@ namespace ComputerResourceBroadcaster
         {
             /// httpListenerで待ち受け
             var httpListener = new HttpListener();
-            foreach (string s in StaticMethods.getMyIPv4()){
-                string address = string.Format("http://{0}:{1}", s, port);
+            /*
+            foreach (string s in StaticMethods.getMyIPv4())
+            {
+                string address = string.Format("http://{0}:{1}/", s, port);
                 httpListener.Prefixes.Add(address);
             }
+            */
+            httpListener.Prefixes.Add(string.Format("http://*:{0}/", port));
+
             httpListener.Start();
 
             while (true)
             {
+                Console.WriteLine("httpstart");
                 /// 接続待機
                 var listenerContext = await httpListener.GetContextAsync();
                 if (listenerContext.Request.IsWebSocketRequest)

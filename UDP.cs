@@ -26,7 +26,7 @@ namespace ComputerResourceBroadcaster
             this.port = port;
             var local = new IPEndPoint(IPAddress.Any, port);
             client = new UdpClient(local);
-            Task t = ListenMessage();
+            //Task t = ListenMessage();
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace ComputerResourceBroadcaster
             client.Connect(new IPEndPoint(IPAddress.Broadcast, port));
 
             await client.SendAsync(buff, buff.Length);
-            client.Close();
+            //client.Close();
         }
         /// <summary>
         /// メッセージ送信
