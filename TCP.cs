@@ -9,7 +9,7 @@ using System.Net.Sockets;
 
 namespace ComputerResourceBroadcaster
 {
-    class TCP : Isocket
+    public class TCP : Isocket
     {
         TcpListener listener;
         List<TcpClient> clients;

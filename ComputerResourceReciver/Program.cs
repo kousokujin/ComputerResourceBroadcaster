@@ -15,7 +15,7 @@ namespace ComputerResourceReciver
     {
         static int port;
         static UdpClient client;
-        static ClientWebSocket ws;
+        static TcpClient tcp;
         const int MessageBufferSize = 256;
 
         static void Main(string[] args)
@@ -25,7 +25,6 @@ namespace ComputerResourceReciver
             Console.WriteLine("listen...");
             string ip = ListenBroadcastMessage();
             Connect(ip);
-            Console.WriteLine("connect!!");
             Console.ReadLine();
         }
 
@@ -45,24 +44,47 @@ namespace ComputerResourceReciver
             return remote.Address.ToString();
         }
 
-        static async void Connect(string ip)
+        static void Connect(string ip)
         {
-            if (ws == null)
-            {
-                ws = new ClientWebSocket();
-            }
+            tcp = new TcpClient(ip, 11000);
+            var ns = tcp.GetStream();
+            ns.ReadTimeout = 10000;
+            ns.WriteTimeout = 10000;
 
-            if (ws.State != WebSocketState.Open)
+            Task t = ListenerCallback(tcp);
+            t.Wait();
+
+        }
+
+        static async Task ListenerCallback(TcpClient cl)
+        {
+            var ns = cl.GetStream();
+
+            System.Text.Encoding enc = System.Text.Encoding.UTF8;
+            bool disconnected = false;
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+
+            while (disconnected == false)
             {
-                await ws.ConnectAsync(new Uri(string.Format("ws://{0}:{1}/",ip,"11000")), CancellationToken.None);
-                Console.WriteLine();
-                while (ws.State == WebSocketState.Open)
+                byte[] resBytes = new byte[256];
+                int resSize = 0;
+                do
                 {
-                    var buff = new ArraySegment<byte>(new byte[MessageBufferSize]);
-                    var ret = await ws.ReceiveAsync(buff, CancellationToken.None);
-                    Console.WriteLine("receive:{0}",((new UTF8Encoding()).GetString(buff.Take(ret.Count).ToArray())));
-                }
+                    resSize = await ns.ReadAsync(resBytes, 0, resBytes.Length);
+                    if (resSize == 0)
+                    {
+                        disconnected = true;
+                        break;
+                    }
+                    ms.Write(resBytes, 0, resSize);
+
+                } while (ns.DataAvailable);
+
+                string resMsg = enc.GetString(ms.GetBuffer(), 0, (int)ms.Length);
+
+                Console.WriteLine("receive:{0}", resMsg);
             }
+            ms.Close();
         }
     }
 }
